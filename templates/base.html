@@ -1,4 +1,5 @@
 {% load staticfiles %}
+{% load blogs_tags %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -13,6 +14,7 @@
     <link rel="stylesheet" href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
 	<link rel="stylesheet" href="{% static 'blogs/css/pace.css' %}">
 	<link rel="stylesheet" href="{% static 'blogs/css/custom.css' %}">
+	<link rel="stylesheet" href="{% static 'blogs/css/highlights/tango.css' %}">
 
     <!-- js -->
 	<script src="{% static 'blogs/js/jquery-2.1.3.min.js' %}"></script>
@@ -27,7 +29,7 @@
         <div class="row">
             <div class="col-md-4 col-sm-5 col-xs-8">
                 <div class="logo">
-                    <h1><a href="index.html"><b>Black</b> &amp; White</a></h1>
+					<h1><a href="{% url 'blogs:index' %}"><b>Black</b> &amp; White</a></h1>
                 </div>
             </div><!-- col-md-4 -->
             <div class="col-md-8 col-sm-7 col-xs-4">
@@ -75,45 +77,42 @@
 				{% endblock toc %}
                 <div class="widget widget-recent-posts">
                     <h3 class="widget-title">最新文章</h3>
+					{% get_recent_posts as recent_post_list %}
                     <ul>
+						{% for post in recent_post_list %}
                         <li>
-                            <a href="#">Django 博客开发入门教程：前言</a>
+							<a href="{% url 'blogs:detail' post.pk %}">{{ post.title }}</a>
                         </li>
-                        <li>
-                            <a href="#">Django 博客使用 Markdown 自动生成文章目录</a>
-                        </li>
-                        <li>
-                            <a href="#">部署 Django 博客</a>
-                        </li>
+						{% empty %}
+						<p>暂无文章</p>
+						{% endfor %}
                     </ul>
                 </div>
                 <div class="widget widget-archives">
                     <h3 class="widget-title">归档</h3>
+					{% archives as date_list %}
                     <ul>
+						{% for date in date_list %}
                         <li>
-                            <a href="#">2017 年 5 月</a>
+							<a href="{% url 'blogs:archives' date.year date.month %}">{{ date.year }} 年 {{ date.month }} 月</a>
                         </li>
-                        <li>
-                            <a href="#">2017 年 4 月</a>
-                        </li>
-                        <li>
-                            <a href="#">2017 年 3 月</a>
-                        </li>
+						{% empty %}
+						<p>暂无归档</p>
+						{% endfor %}
                     </ul>
                 </div>
 
                 <div class="widget widget-category">
                     <h3 class="widget-title">分类</h3>
+					{% get_categories as category_list %}
                     <ul>
+						{% for category in category_list %}
                         <li>
-                            <a href="#">Django 博客教程 <span class="post-count">(13)</span></a>
+							<a href="{% url 'blogs:category' category.pk %}">{{ category.name }} <span class="post-count">(13)</span></a>
                         </li>
-                        <li>
-                            <a href="#">Python 教程 <span class="post-count">(11)</span></a>
-                        </li>
-                        <li>
-                            <a href="#">Django 用户认证 <span class="post-count">(8)</span></a>
-                        </li>
+						{% empty %}
+						<p>暂无标签</p>
+						{% endfor %}
                     </ul>
                 </div>
 
