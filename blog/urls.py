@@ -20,5 +20,6 @@ from . import views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', views.first_page, name='first_page'),
-    url(r'^blog/', include('blogs.urls'))
+    url(r'^blog/', include('blogs.urls')),
+    url(r'^blog/', include('comments.urls')),
 ]

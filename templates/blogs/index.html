@@ -1,4 +1,7 @@
 {% extends 'base.html' %}
+{% block title %}
+<title>{{ title }}</title>
+{% endblock %}
 
 {% block main %}
 	{% for post in post_list %}
@@ -8,12 +11,12 @@
 					<a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
                 </h1>
                 <div class="entry-meta">
-					<span class="post-category"><a href="#">{{ post.category.name }}</a></span>
-                    <span class="post-date"><a href="#"><time class="entry-date"
+					<span class="post-category"><a href="{% url 'blogs:category' post.category.pk %}">{{ post.category.name }}</a></span>
+					<span class="post-date"><a href="{% url 'blogs:archives' post.created_time.year post.created_time.month %}"><time class="entry-date"
 														datetime="{{ post.created_time }}">{{ post.created_time }}</time></a></span>
 					<span class="post-author"><a href="#">{{ post.author }}</a></span>
-                    <span class="comments-link"><a href="#">4 评论</a></span>
-                    <span class="views-count"><a href="#">588 阅读</a></span>
+					<span class="comments-link"><a href="{% url 'blogs:detail' post.pk %}#comment-area">{{ post.comment_set.count }} 评论</a></span>
+                    <span class="views-count"><a href="{% url 'blogs:detail' post.pk %}">588 阅读</a></span>
                 </div>
             </header>
             <div class="entry-content clearfix">
