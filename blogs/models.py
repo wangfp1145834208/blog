@@ -1,6 +1,8 @@
+import markdown
 from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
+from django.utils.html import strip_tags
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
@@ -23,12 +25,26 @@ class Post(models.Model):
     category = models.ForeignKey(Category)
     tags = models.ManyToManyField(Tag, blank=True)
     author = models.ForeignKey(User)
+    viewers = models.PositiveIntegerField(default = 10)
 
     def __str__(self):
         return self.title
 
     def get_absolute_url(self):
         return reverse('blogs:detail', kwargs={'pk': self.pk})
+
+    def increase_viewers(self):
+        self.viewers += 1
+        self.save(update_fields=['viewers'])
+
+    def save(self, *args, **kwargs):
+        if not self.excerpt:
+            md = markdown.Markdown(extension=[
+                'markdown.extensions.extra',
+                'markdown.extensions.codehilite',
+            ])
+            self.excerpt = strip_tags(md.convert(self.body))[:50] + '...'
+        super().save(*args, **kwargs)
 
     class Meta:
         ordering = ['-created_time']
