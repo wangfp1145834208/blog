@@ -9,12 +9,59 @@ class IndexView(ListView):
     model = Post
     template_name = 'blogs/index.html'
     context_object_name = 'post_list'
+    paginate_by = 1
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        paginator = context['paginator']
+        page = context['page_obj']
+        is_paginated = context['is_paginated']
+        pagination_data = self.pagination_data(paginator, page, is_paginated)
+        context.update(pagination_data)
         title = 'Black & White'
         context.update({'title': title})
         return context
+
+    def pagination_data(self, paginator, page, is_paginated):
+        if not is_paginated:
+            return {}
+        left_has_more = False
+        right_has_more = False
+        size = 2
+        left = []
+        right = []
+        page_number = page.number
+        total_pages = paginator.num_pages
+        if page_number == 1:
+            if total_pages - page_number < size:
+                right.extend(range(2, total_pages))
+            else:
+                right.extend(range(2, 3))
+                right_has_more = True
+        elif page_number < total_pages:
+            if page_number - 1 <= size:
+                left.extend(range(1, page_number))
+            else:
+                left.extend(range(page_number - size + 1, page_number))
+                left_has_more = True
+            if total_pages - page_number <= size:
+                right.extend(range(page_number + 1, total_pages + 1))
+            else:
+                right.extend(range(page_number + 1, page_number + size))
+                right_has_more = True
+        else:
+            if page_number - 1 < size:
+                left.extend(range(1, page_number))
+            else:
+                left.extend(range(page_number - size + 1, page_number))
+                left_has_more = True
+        data = {
+            'left': left,
+            'right': right,
+            'left_has_more': left_has_more,
+            'right_has_more': right_has_more,
+        }
+        return data
 
 class CategoryView(IndexView):
     def get_queryset(self):
@@ -22,7 +69,7 @@ class CategoryView(IndexView):
         return super().get_queryset().filter(category=cate)
 
     def get_context_data(self, **kwargs):
-        context = ListView.get_context_data(self, **kwargs)
+        context = super().get_context_data(**kwargs)
         cate = get_object_or_404(Category, pk=self.kwargs['pk'])
         title = cate.name + ' 类'
         context['title'] = title
@@ -36,7 +83,7 @@ class ArchiveView(IndexView):
                                             created_time__month=month)
 
     def get_context_data(self, **kwargs):
-        context = ListView.get_context_data(self, **kwargs)
+        context = super().get_context_data(**kwargs)
         year = self.kwargs['year']
         month = self.kwargs['month']
         title = year + ' 年 ' + month + ' 月'
