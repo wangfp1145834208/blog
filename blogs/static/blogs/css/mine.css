@@ -1,0 +1,9 @@
+.list-inline-item {
+    background-color: #eee;
+    font-size: 1.2em;
+}
+
+.error {
+    color: red;
+    font-size: 1.5em;
+}

@@ -4,7 +4,7 @@ from comments.models import Comment
 
 class CommentInline(admin.StackedInline):
     model = Comment
-    extra = 3
+    extra = 1
 
 class PostAdmin(admin.ModelAdmin):
     list_display = ['title', 'created_time', 'modified_time', 'category', 'author']

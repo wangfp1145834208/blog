@@ -1,15 +1,18 @@
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import ListView, DetailView
+from django.utils.text import slugify
+from django.db.models import Q
 import markdown
+from markdown.extensions.toc import TocExtension
 
 from comments.forms import CommentForm
-from .models import Post, Category
+from .models import Post, Category, Tag
 
 class IndexView(ListView):
     model = Post
     template_name = 'blogs/index.html'
     context_object_name = 'post_list'
-    paginate_by = 1
+    paginate_by = 3
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -33,8 +36,8 @@ class IndexView(ListView):
         page_number = page.number
         total_pages = paginator.num_pages
         if page_number == 1:
-            if total_pages - page_number < size:
-                right.extend(range(2, total_pages))
+            if total_pages - page_number <= size:
+                right.extend(range(2, total_pages + 1))
             else:
                 right.extend(range(2, 3))
                 right_has_more = True
@@ -50,7 +53,7 @@ class IndexView(ListView):
                 right.extend(range(page_number + 1, page_number + size))
                 right_has_more = True
         else:
-            if page_number - 1 < size:
+            if page_number - 1 <= size:
                 left.extend(range(1, page_number))
             else:
                 left.extend(range(page_number - size + 1, page_number))
@@ -90,6 +93,18 @@ class ArchiveView(IndexView):
         context['title'] = title
         return context
 
+class TagView(IndexView):
+    def get_queryset(self):
+        tag = get_object_or_404(Tag, pk=self.kwargs['pk'])
+        return super().get_queryset().filter(tags=tag)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        tag = Tag.objects.get(pk=self.kwargs['pk'])
+        title = tag.name + '_标签'
+        context['title'] = title
+        return context
+
 class PostDetailView(DetailView):
     model = Post
     template_name = 'blogs/detail.html'
@@ -102,12 +117,13 @@ class PostDetailView(DetailView):
 
     def get_object(self, queryset=None):
         post = super().get_object(queryset=None)
-        post.body = markdown.markdown(post.body,
-                                      extensions=[
-                                          'markdown.extensions.extra',
-                                          'markdown.extensions.codehilite',
-                                          'markdown.extensions.toc',
-                                      ])
+        md = markdown.Markdown(extensions=[
+            'markdown.extensions.extra',
+            'markdown.extensions.codehilite',
+            TocExtension(slugify=slugify),
+        ])
+        post.body = md.convert(post.body)
+        post.toc = md.toc
         return post
 
     def get_context_data(self, **kwargs):
@@ -121,6 +137,20 @@ class PostDetailView(DetailView):
             'title': title,
         })
         return context
+
+def search(request):
+    q = request.GET['q']
+    error_msg = ''
+    title = '搜索'
+
+    if not q:
+        error_msg = "请输入关键词"
+        return render(request, 'blogs/index.html', {'error_msg': error_msg,
+                                                    'title': title})
+    post_list = Post.objects.filter(Q(title__icontains=q) | Q(body__icontains=q))
+    return render(request, 'blogs/index.html', {'error_msg': error_msg,
+                                                'post_list': post_list,
+                                                'title': title})
 
 def index(request):
     post_list = Post.objects.all()
