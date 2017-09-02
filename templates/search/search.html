@@ -2,8 +2,8 @@
 {% load highlight %}
 
 {% block title %}
-<title>搜索<title>
-{% endblock %}
+<title>搜索</title>
+{% endblock title %}
 
 {% block main %}
 {% if query %}
@@ -20,8 +20,8 @@
 					<span class="post-date">
                         <a href="{% url 'blogs:archives' result.object.created_time.year result.object.created_time.month %}">
                             <time class="entry-date" datetime="{{ result.object.created_time }}">
-                                {{ result.objcet.created_time }}</time></a></span>
-					<span class="post-author"><a href="#">{{ result.objet.author }}</a></span>
+                                {{ result.object.created_time }}</time></a></span>
+					<span class="post-author"><a href="#">{{ result.object.author }}</a></span>
 					<span class="comments-link"><a href="{% url 'blogs:detail' result.object.pk %}#comment-area">
                             {{ result.object.comment_set.count }} 评论</a></span>
                     <span class="views-count"><a href="{% url 'blogs:detail' result.object.pk %}">

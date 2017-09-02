@@ -42,13 +42,13 @@ INSTALLED_APPS = [
     'comments',
 ]
 
-HAYSTACK_CONNETIONS = {
+HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE': 'blogs.whoosh_cn_backend.WhooshEngine',
         'PATH': os.path.join(BASE_DIR, 'whoosh_index'),
     },
 }
-HAYSTACK_SEARCH_RESULTS_PER_PAGE = 10
+HAYSTACK_SEARCH_RESULTS_PER_PAGE = 3
 HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 
 MIDDLEWARE = [
