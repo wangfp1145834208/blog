@@ -1,8 +1,10 @@
 import markdown
 from django.db import models
-from django.contrib.auth.models import User
+#from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils.html import strip_tags
+from users.models import User
+
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
@@ -10,11 +12,13 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+
 class Tag(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name
+
 
 class Post(models.Model):
     title = models.CharField(max_length=100)

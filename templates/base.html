@@ -17,7 +17,6 @@
 	<link rel="stylesheet" href="{% static 'blogs/css/custom.css' %}">
 	<link rel="stylesheet" href="{% static 'blogs/css/highlights/tango.css' %}">
     <link rel="stylesheet" href="{% static 'blogs/css/mine.css' %}">
-
     <style>
         span.highlighted {
             color: red;
@@ -73,6 +72,22 @@
 </div>
 <div class="copyrights">Collect from <a href="http://www.cssmoban.com/">网页模板</a></div>
 <div class="copyrights">Modified by <a href="http://zmrenwu.com/">追梦人物的博客</a></div>
+
+<div class="flex-center">
+    <div class="container">
+        <div>
+            <h1 class="logo"><a href="{% url 'blogs:index' %}">Django Auth Example<a></h1>
+            {% if user.is_authenticated %}
+            <p>您已登录，欢迎您：<a href='#'>{{ user.username }}</a></p>
+            <a href="{% url 'logout' %}?next={{ request.path }}">注销登录</a>
+            <a href="{% url 'password_change' %}?next={{ request.path }}">修改密码</a>
+            {% else %}
+            <p>您尚未登录，请<a href="{% url 'login' %}?next={{ request.path }}">登录</a>
+            或者<a href="{% url 'users:register' %}">注册</a></p>
+            {% endif %}
+        </div>
+    </div>
+</div>
 
 <div class="content-body">
     <div class="container">
